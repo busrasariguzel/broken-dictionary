@@ -4,20 +4,21 @@ const Word = require('./models/Words')
 
 router.get('/', (req, res) => {
   Word.find({}).then(words => {
-    res.render('viewDictionary', { words });
-  });
+    return res.render('viewDictionary', { words });
+  }).catch(err=>res.status(500).json({message: 'Server Error', err}))
 });
 
 //add a new word
-router.delete('/addWord', (req, res) => {
-  const { word, definition } = req.body;
+router.post('/addword', (req, res) => {
+  // const { word, definition } = req.body;
 
-  if (!word || !definition) {
-    return res.status(500).json({ message: 'All Inputs must be filled' });
+  // if (!word || !definition) {
+    if(!req.body.word || !req.body.definition) {
+    return res.status(400).json({ message: 'All Inputs must be filled' });
   }
 
   Word.findOne({ word: req.body.word })
-    .then(word => {
+    .then((word) => {
       if (word) {
         return res
           .status(500)
@@ -30,7 +31,7 @@ router.delete('/addWord', (req, res) => {
 
       newWord
         .save()
-        .then(word => {
+        .then((word) => {
           return res.status(200).json({ message: 'Success', word });
         })
         .catch(err => res.status(500).json(err));
@@ -38,8 +39,13 @@ router.delete('/addWord', (req, res) => {
     .catch(err => res.status(500).json({ message: 'Server Error' }, err));
 });
 
+router.get('/addword', (req, res) => {
+  return res.render('addWord');
+  
+});
+
 router.get('/findWord', (req, res) => {
-  res.render('findWord', { word: null });
+  return res.render('findWord', { word: null });
 });
 
 router.get('/foundWord', (req, res) => {
@@ -47,11 +53,11 @@ router.get('/foundWord', (req, res) => {
     if (word) {
       //   res.json(word);
       console.log(word);
-      res.render('findWord', { word });
+      return res.render('findWord', { word });
     } else {
-      res.json({ message: 'Word not found' });
+      return res.status(400).json({ message: 'Word not found' });
     }
-  });
+  }).catch(err=> res.status(500).json({message: 'oops Server Error'}));
 });
 
 router.put('/:word', (req, res) => {
@@ -72,16 +78,20 @@ router.put('/:word', (req, res) => {
           res.status(500).json({ message: 'Unable to update word', err })
         );
     } else {
-      res.json({ message: 'Cannot find word' });
+      return res.status(200).json({ message: 'Cannot find word' });
     }
-  });
+  }).catch(err=> res.status(500).json({message: 'Server Error', err}));
 });
 
-router.delete('/word', (req, res) => {
+router.delete('/:word', (req, res) => {
   Word.findOneAndDelete({ word: req.params.word })
     .then(word => {
-      return res.status(200).json({ message: 'Word deleted', word });
-    })
+      if(word) {
+        return res.status(200).json({ message: 'Word deleted', word });
+      }else {
+        return res.status(200).json({message: 'No word to delete'});
+      }
+      })
     .catch(err => res.status(500).json({ message: 'Problem deleting', err }));
 });
 

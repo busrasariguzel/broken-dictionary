@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const app = express();
 const wordRouter= require('./routes/dictionary/wordRoutes')
-const indexRouter = require('./routes/index');
+const indexRouter = require('./routes/indexRouter');
 
   mongoose
     .connect(process.env.MONGODB_URI, {
@@ -24,7 +24,7 @@ const indexRouter = require('./routes/index');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 
