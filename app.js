@@ -3,22 +3,24 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-
-const Word = require('./routes/dictionary/models/Words');
+const mongoose= require('mongoose');
+// const Word = require('./routes/dictionary/models/Words');
 require('dotenv').config();
 
 const app = express();
-
+const wordRouter= require('./routes/dictionary/wordRoutes')
 const indexRouter = require('./routes/index');
 
-mongoose
-  .connect(port, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-  })
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.log(`MongoDB Error: ${err}`));
+  mongoose
+    .connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true
+    })
+    .then(() => {
+        console.log('MongoDB Connected');
+    })
+    .catch(err => console.log(`Mongodb Error: ${err}`));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/words', wordRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

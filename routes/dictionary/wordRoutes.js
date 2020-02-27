@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Word = require('./models/Words')
 
 router.get('/', (req, res) => {
   Word.find({}).then(words => {
